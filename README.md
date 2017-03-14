@@ -1,7 +1,7 @@
 # au-revoir
 A SayonaraJS client for presentations. Made with [Reveal.JS](https://github.com/hakimel/reveal.js/) and [AngularJS](https://angularjs.org/)
 
-![Aurevoir example gif](https://files.aaronthedev.com/$/hgtzb)
+![Aurevoir example gif](https://files.aaronthedev.com/$/5rnjx)
 
 # Install
 
