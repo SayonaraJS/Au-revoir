@@ -26,14 +26,22 @@
 			<div ng-controller="slideController" class="slides">
 
 					<!-- Horizontal Slides (Only a page) -->
-					<section ng-repeat="page in sayonaraSite.pages | orderBy:'order'">
+					<section ng-repeat="page in sayonaraSite.pages | orderBy:'order'"
+						ng-if="!page.allEntries || page.allEntries.length <= 0">
 						<h1>{{page.title}}</h1>
 						<div ng-bind-html="trustAsHtml(page.content)">
 						</div>
 					</section>
 
 					<!-- Vertical Slides -->
-					<section ng-if="page.allEntries && page.allEntries.length > 0">
+					<section ng-repeat="page in sayonaraSite.pages | orderBy:'order'"
+						ng-if="page.allEntries && page.allEntries.length > 0">
+						<!-- The itinial page slide -->
+						<section>
+							<h1>{{page.title}}</h1>
+							<div ng-bind-html="trustAsHtml(page.content)">
+							</div>
+						</section>
 						<section ng-repeat="entry in page.allEntries | orderBy:'order'">
 							<h1>{{entry.title}}</h1>
 							<div ng-bind-html="trustAsHtml(entry.content)">
