@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Au Revoir</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/black.css">
@@ -21,16 +21,93 @@
 			document.getElementsByTagName( 'head' )[0].appendChild( link );
 		</script>
 	</head>
-	<body>
+	<body ng-app="aurevoir">
 		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+			<div ng-controller="slideController" class="slides">
+
+					<!-- Horizontal Slides (Only a page) -->
+					<section ng-repeat="page in sayonaraSite.pages | orderBy:'order'">
+						<h1>{{page.title}}</h1>
+						<div ng-bind-html="trustAsHtml(page.content)">
+						</div>
+					</section>
+
+					<!-- Vertical Slides -->
+					<section ng-if="page.allEntries && page.allEntries.length > 0">
+						<section ng-repeat="entry in page.allEntries | orderBy:'order'">
+							<h1>{{entry.title}}</h1>
+							<div ng-bind-html="trustAsHtml(entry.content)">
+							</div>
+						</section>
+					</section>
 			</div>
 		</div>
 
 		<script src="lib/js/head.min.js"></script>
 		<script src="js/reveal.js"></script>
+
+		<!-- import angular for server-side includes and extra fun -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.js"></script>
+	<script>
+		(function() {
+			var app = angular.module("aurevoir", []);
+			app.controller("slideController", ["$scope", "$http", "$sce", "$log", function($scope, $http, $sce, $log) {
+				//Initialize the sayonara site
+				$scope.sayonaraSite = {
+					"pages": [{
+						"conent": "Loading..."
+					}]
+				}
+
+				//Get our trust as html function
+				$scope.trustAsHtml = $sce.trustAsHtml;
+
+				//Make a request to our sayonara server
+				var PRODUCTION = false
+		    var sayonaraUrlPath = '/api/public';
+		    var sayonaraUrlHost = '';
+		    // Production and API URL from webpack config
+		    if (PRODUCTION) {
+		      // Point to prod sayonara
+		      sayonaraUrlHost = '//' + this.$location.host();
+		    } else {
+		      // Point to Dev sayonara
+		      sayonaraUrlHost = 'http://localhost:8000';
+		    }
+
+
+				$http({
+		      method: 'GET',
+		      url: sayonaraUrlHost + sayonaraUrlPath
+		    }).then(response => {
+			    // this callback will be called asynchronously
+			    // when the response is available
+		      $log.debug('Sayonara Response: ', response.data);
+		      $scope.sayonaraSite = response.data;
+
+					//concatenate a pages entries from entry types
+					$scope.sayonaraSite.pages.forEach(function (page, pageIndex) {
+						$scope.sayonaraSite.pages[pageIndex].allEntries = [];
+						page.entryTypes.forEach(function(entryType, entryTypeIndex) {
+							entryType.entries.forEach(function(entry, entryIndex) {
+								$scope.sayonaraSite.pages[pageIndex].allEntries.push(entry);
+							});
+						})
+					});
+		    }, response => {
+		      // called asynchronously if an error occurs
+		      // or server returns response with an error status.
+		      $log.error('Sayonara Error: ', response);
+					$scope.sayonaraSite = {
+						"pages": [{
+							"conent": "Error retrieving slides..."
+						}]
+					}
+		    });
+			}]);
+			//End of the angular app
+		})();
+	</script>
 
 		<script>
 			// More info https://github.com/hakimel/reveal.js#configuration
