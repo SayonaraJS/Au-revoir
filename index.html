@@ -60,7 +60,7 @@
 	<script>
 		(function() {
 			var app = angular.module("aurevoir", []);
-			app.controller("slideController", ["$scope", "$http", "$sce", "$log", function($scope, $http, $sce, $log) {
+			app.controller("slideController", ["$scope", "$http", "$sce", "$location", "$log", function($scope, $http, $sce, $location, $log) {
 				//Initialize the sayonara site
 				$scope.sayonaraSite = {
 					"pages": [{
@@ -78,7 +78,7 @@
 		    // Production and API URL from webpack config
 		    if (PRODUCTION) {
 		      // Point to prod sayonara
-		      sayonaraUrlHost = '//' + this.$location.host();
+		      sayonaraUrlHost = '//' + $location.host();
 		    } else {
 		      // Point to Dev sayonara
 		      sayonaraUrlHost = 'http://localhost:8000';
